@@ -1,0 +1,65 @@
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+-- 1. Create the UI
+local screenGui = Instance.new("ScreenGui", PlayerGui)
+screenGui.Name = "LuckyScriptUI"
+screenGui.IgnoreGuiInset = true
+
+-- 2. Main Frame (Draggable)
+local card = Instance.new("Frame", screenGui)
+card.Size = UDim2.new(0, 300, 0, 270) -- Increased height to fit 4 buttons
+card.Position = UDim2.new(0.5, -150, 0.5, -135)
+card.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+card.BorderSizePixel = 0
+card.Active = true 
+card.Draggable = true 
+Instance.new("UICorner", card).CornerRadius = UDim.new(0, 12)
+
+-- 3. Title
+local title = Instance.new("TextLabel", card)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "✨ X100 Lucky Script"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.BackgroundTransparency = 1
+
+-- 4. Close Button (X)
+local closeBtn = Instance.new("TextButton", card)
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
+closeBtn.Text = "X"
+closeBtn.TextColor3 = Color3.new(1, 1, 1)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(1, 0)
+closeBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
+
+-- 5. Buttons Function
+local function createButton(text, yPos)
+    local btn = Instance.new("TextButton", card)
+    btn.Size = UDim2.new(0.9, 0, 0, 40)
+    btn.Position = UDim2.new(0.05, 0, 0, yPos)
+    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+    btn.Text = text
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    
+    -- Toggle State
+    local isOn = false
+    btn.MouseButton1Click:Connect(function()
+        isOn = not isOn
+        btn.BackgroundColor3 = isOn and Color3.fromRGB(76, 175, 80) or Color3.fromRGB(45, 45, 60)
+        btn.Text = text .. (isOn and " [ON]" or " [OFF]")
+    end)
+end
+
+-- Create buttons at different heights
+createButton("☘️ Boost Luck", 50)
+createButton("⏰ Bypass Time", 100)
+createButton("💰 Bypass Cash", 150)
+createButton("🐉 Dragon Gacha", 200) -- New button added
+
