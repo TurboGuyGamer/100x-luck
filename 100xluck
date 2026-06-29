@@ -2,64 +2,134 @@ local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
--- 1. Create the UI
+-- Theme Colors
+local COLORS = {
+    BG = Color3.fromRGB(15, 15, 25),
+    CYAN = Color3.fromRGB(0, 220, 255),
+    PURPLE = Color3.fromRGB(138, 43, 226),
+    WHITE = Color3.fromRGB(255, 255, 255),
+    FAIL = Color3.fromRGB(255, 50, 50)
+}
+
+-- Logs
+local logs = {
+    "Initializing Core...", "Loading Kernel...", "Syncing Modules...", "Bypassing Anti-Cheat...",
+    "Injecting Binary...", "Allocating RAM...", "Fetching User Data...", "Decrypting Files...",
+    "Validating Version...", "Optimizing Scripts...", "Connecting to Proxy...", "Checking Permissions...",
+    "Parsing Game Data...", "Updating UI Frames...", "Generating Hash Keys...", "Loading Textures...",
+    "Buffering Inputs...", "Scanning Directory...", "Pre-loading Shaders...", "Applying Patches...",
+    "Refining Execution...", "Memory Cleanup...", "Finalizing Hooks...", "Starting Engine...",
+    "Verifying Identity...", "Establishing Secure Link...", "Booting Turbo Hub...", "Loading Assets...",
+    "Device Authentication...", "Finalizing Boot Sequence..."
+}
+
+-- Create UI
 local screenGui = Instance.new("ScreenGui", PlayerGui)
-screenGui.Name = "LuckyScriptUI"
-screenGui.IgnoreGuiInset = true
+screenGui.Name = "TurboLoadingUI"
 
--- 2. Main Frame (Draggable)
 local card = Instance.new("Frame", screenGui)
-card.Size = UDim2.new(0, 300, 0, 270) -- Increased height to fit 4 buttons
-card.Position = UDim2.new(0.5, -150, 0.5, -135)
-card.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+card.Size = UDim2.new(0, 450, 0, 250)
+card.Position = UDim2.new(0.5, -225, 0.5, -125)
+card.BackgroundColor3 = COLORS.BG
 card.BorderSizePixel = 0
-card.Active = true 
-card.Draggable = true 
-Instance.new("UICorner", card).CornerRadius = UDim.new(0, 12)
+card.Active = true
+card.Draggable = true
+Instance.new("UICorner", card).CornerRadius = UDim.new(0, 20)
+Instance.new("UIStroke", card).Color = COLORS.PURPLE
+Instance.new("UIStroke", card).Thickness = 3
 
--- 3. Title
 local title = Instance.new("TextLabel", card)
-title.Size = UDim2.new(1, 0, 0, 40)
-title.Text = "✨ X100 Lucky Script"
-title.TextColor3 = Color3.new(1, 1, 1)
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Text = "Turbo Hub 100x Luck 🍀"
+title.TextColor3 = COLORS.CYAN
 title.Font = Enum.Font.GothamBold
-title.TextSize = 16
+title.TextSize = 24
 title.BackgroundTransparency = 1
 
--- 4. Close Button (X)
-local closeBtn = Instance.new("TextButton", card)
-closeBtn.Size = UDim2.new(0, 30, 0, 30)
-closeBtn.Position = UDim2.new(1, -35, 0, 5)
-closeBtn.Text = "X"
-closeBtn.TextColor3 = Color3.new(1, 1, 1)
-closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(1, 0)
-closeBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
+local barBg = Instance.new("Frame", card)
+barBg.Size = UDim2.new(0.9, 0, 0, 25)
+barBg.Position = UDim2.new(0.05, 0, 0, 70)
+barBg.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+Instance.new("UICorner", barBg).CornerRadius = UDim.new(0, 12)
 
--- 5. Buttons Function
-local function createButton(text, yPos)
-    local btn = Instance.new("TextButton", card)
-    btn.Size = UDim2.new(0.9, 0, 0, 40)
-    btn.Position = UDim2.new(0.05, 0, 0, yPos)
-    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
-    btn.Text = text
-    btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.Font = Enum.Font.Gotham
-    btn.TextSize = 14
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+local barFill = Instance.new("Frame", barBg)
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BackgroundColor3 = COLORS.CYAN
+Instance.new("UICorner", barFill).CornerRadius = UDim.new(0, 12)
+
+local percentText = Instance.new("TextLabel", card)
+percentText.Size = UDim2.new(0, 100, 0, 50)
+percentText.Position = UDim2.new(0.5, -50, 0, 100)
+percentText.Text = "0%"
+percentText.TextColor3 = COLORS.WHITE
+percentText.Font = Enum.Font.GothamBold
+percentText.TextScaled = true
+percentText.BackgroundTransparency = 1
+
+local statusLog = Instance.new("TextLabel", card)
+statusLog.Size = UDim2.new(0.9, 0, 0, 30)
+statusLog.Position = UDim2.new(0.05, 0, 0, 180)
+statusLog.Text = "Loading..."
+statusLog.TextColor3 = Color3.fromRGB(200, 200, 200)
+statusLog.Font = Enum.Font.Code
+statusLog.TextSize = 14
+statusLog.BackgroundTransparency = 1
+
+-- Execution
+task.spawn(function()
+    local totalTime = 1800 -- 30 Minutes
+    local logIndex = 1
     
-    -- Toggle State
-    local isOn = false
-    btn.MouseButton1Click:Connect(function()
-        isOn = not isOn
-        btn.BackgroundColor3 = isOn and Color3.fromRGB(76, 175, 80) or Color3.fromRGB(45, 45, 60)
-        btn.Text = text .. (isOn and " [ON]" or " [OFF]")
-    end)
-end
-
--- Create buttons at different heights
-createButton("☘️ Boost Luck", 50)
-createButton("⏰ Bypass Time", 100)
-createButton("💰 Bypass Cash", 150)
-createButton("🐉 Dragon Gacha", 200) -- New button added
-
+    for i = 1, 95 do
+        task.wait((totalTime / 96) * math.random(0.5, 1.5)) 
+        barFill.Size = UDim2.new(i/100, 0, 1, 0)
+        percentText.Text = i .. "%"
+        
+        if i % 3 == 0 and logIndex <= #logs then
+            statusLog.Text = logs[logIndex]
+            logIndex = logIndex + 1
+        end
+    end
+    
+    -- STUCK AT 96% & LAG SIMULATION
+    percentText.Text = "96%"
+    statusLog.Text = "loading player device compatibility"
+    
+    -- Lag Loop: Freezes the UI thread for 5 seconds to simulate a crash/lag
+    local startTime = tick()
+    while tick() - startTime < 5 do
+        -- Heavy math to spike CPU and cause stuttering
+        local x = math.sqrt(999999) * math.sin(999999)
+    end
+    
+    task.wait(300) -- Wait after lag
+    
+    card:Destroy()
+    
+    -- Final Failed Screen
+    local failUi = Instance.new("Frame", screenGui)
+    failUi.Size = UDim2.new(0, 350, 0, 200)
+    failUi.Position = UDim2.new(0.5, -175, 0.5, -100)
+    failUi.BackgroundColor3 = COLORS.BG
+    failUi.Active = true
+    failUi.Draggable = true
+    Instance.new("UICorner", failUi).CornerRadius = UDim.new(0, 20)
+    Instance.new("UIStroke", failUi).Color = COLORS.FAIL
+    Instance.new("UIStroke", failUi).Thickness = 3
+    
+    local bigX = Instance.new("TextLabel", failUi)
+    bigX.Size = UDim2.new(1, 0, 0, 80)
+    bigX.Text = "FAILED ❌"
+    bigX.TextColor3 = COLORS.FAIL
+    bigX.Font = Enum.Font.GothamBlack
+    bigX.TextSize = 50
+    bigX.BackgroundTransparency = 1
+    
+    local msg = Instance.new("TextLabel", failUi)
+    msg.Size = UDim2.new(0.8, 0, 0, 80)
+    msg.Position = UDim2.new(0.1, 0, 0, 100)
+    msg.Text = "Script Failed with making compatible with your device. Try again later or tomorrow."
+    msg.TextColor3 = COLORS.WHITE
+    msg.TextWrapped = true
+    msg.BackgroundTransparency = 1
+end)
